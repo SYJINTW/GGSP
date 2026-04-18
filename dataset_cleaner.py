@@ -278,4 +278,8 @@ python dataset_cleaner.py \
 --lod_list 0 1 2 3 \
 --frame_in_group 3
 """
-    
+
+cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1051 ./sample_dataset/dlapisgs/longdress_res8
+cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1052 ./sample_dataset/dlapisgs/longdress_res8
+cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1053 ./sample_dataset/dlapisgs/longdress_res8
+cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1054 ./sample_dataset/dlapisgs/longdress_res8

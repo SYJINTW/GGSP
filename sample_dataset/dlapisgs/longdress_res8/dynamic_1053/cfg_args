@@ -1,0 +1,1 @@
+Namespace(sh_degree=3, source_path='/home/e/e0686126/gs/source/8i/longdress/longdress_res8/1053', model_path='/home/e/e0686126/gs/model/8i/longdress/opacity/longdress_res8/dynamic_1053', images='images', resolution=-1, white_background=False, data_device='cuda', eval=True)
