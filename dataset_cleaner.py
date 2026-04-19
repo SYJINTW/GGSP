@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
 import shutil
-import sys
 import numpy as np
 from argparse import ArgumentParser
 import time
 
+import sys
 sys.path.append('/mnt/data1/syjintw/GS-Interface')
 
 import io_3dgs
@@ -38,6 +38,10 @@ def lapisgs_separate_level(gs_list):
     num_of_point_list = [gs.num_of_point for gs in gs_list]
     # print("num_of_point_list: ", num_of_point_list)
     
+    # Debug: check if the dataset is correct by checking x
+    for gs in gs_list:
+        print("x: ", gs.data["x"]["data"][:10])
+        
     # Opacity
     for i in range(num_of_level):
         # print("Generate opacity for level ", i)
@@ -97,7 +101,8 @@ def main_lapisgs(scene_name,
         
         gs_list = []
         for res in res_list:
-            gs_path = input_root / f"{scene_name}_res{res}" / f"dynamic_{input_frame:04d}" / "point_cloud" / "iteration_30000" / "point_cloud.ply" #! Change to your correct path
+            #! Change to your correct path
+            gs_path = input_root / f"{scene_name}_res{res}" / f"dynamic_{input_frame:04d}" / "point_cloud" / "iteration_30000" / "point_cloud.ply" 
             gs = io_3dgs.GaussianModelV2(gs_path)
             gs_list.append(gs)
 
@@ -222,9 +227,10 @@ if __name__ == "__main__":
         # Process the lapisgs
         if args.gs_type == "lapisgs":
             main_lapisgs(args.scene_name,
-                            args.input_root, args.output_root, 
-                            args.input_start_frame, args.output_start_frame, args.total_frames, 
-                            args.res_list, args.lod_list)
+                        args.input_root, args.output_root, 
+                        args.input_start_frame, args.output_start_frame, args.total_frames, 
+                        args.res_list, args.lod_list)
+            
         elif args.gs_type == "dlapisgs":
             # Check frame_in_group
             if args.frame_in_group <= 0:
@@ -264,8 +270,8 @@ python dataset_cleaner.py \
 --output_root ./dataset/ours/longdress_lapisgs \
 --input_start_frame 1051 --output_start_frame 0 --total_frames 12 \
 --gs_type lapisgs \
---res_list 8 4 2 1 \
---lod_list 0 1 2 3
+--res_list 4 2 1 \
+--lod_list 0 1 2
 
 # DLapisGS (16.13 seconds for 12 frames, with frame_in_group=3)
 python dataset_cleaner.py \
@@ -279,7 +285,14 @@ python dataset_cleaner.py \
 --frame_in_group 3
 """
 
-cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1051 ./sample_dataset/dlapisgs/longdress_res8
-cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1052 ./sample_dataset/dlapisgs/longdress_res8
-cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1053 ./sample_dataset/dlapisgs/longdress_res8
-cp -r /mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity/longdress_res8/dynamic_1054 ./sample_dataset/dlapisgs/longdress_res8
+"""
+python dataset_cleaner.py \
+--scene_name longdress \
+--input_root ./dataset/dlapisgs/longdress/opacity \
+--output_root ./dataset/ours/longdress_lapisgs \
+--input_start_frame 1051 --output_start_frame 0 --total_frames 3 \
+--gs_type lapisgs \
+--res_list 8 4 2 1 \
+--lod_list 0 1 2 3
+"""
+

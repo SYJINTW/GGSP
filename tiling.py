@@ -201,6 +201,35 @@ def save_tiles_to_npz(tile_aabbs, tile_indices, output_path,
     print(f"Total number of stored GS indices: {len(flat_indices_arr)}")
 
 
+def load_tiles_from_npz(npz_path):
+    data = np.load(npz_path)
+
+    tile_idxs = data["tile_idxs"]
+    tile_keys = data["tile_keys"]
+    min_corners = data["min_corners"]
+    max_corners = data["max_corners"]
+    index_offsets = data["index_offsets"]
+    flat_indices = data["flat_indices"]
+
+    grid_shape = data["grid_shape"] if "grid_shape" in data else None
+    scene_min = data["scene_min"] if "scene_min" in data else None
+    scene_max = data["scene_max"] if "scene_max" in data else None
+    layer_idx = data["layer_idx"] if "layer_idx" in data else None
+    
+    return {
+        "tile_idxs": tile_idxs,
+        "tile_keys": tile_keys,
+        "min_corners": min_corners,
+        "max_corners": max_corners,
+        "index_offsets": index_offsets,
+        "flat_indices": flat_indices,
+        "grid_shape": grid_shape,
+        "scene_min": scene_min,
+        "scene_max": scene_max,
+        "layer_idx": layer_idx
+    }
+    
+
 def export_tiles_to_ply(gs, tile_indices, layer_idx, output_dir):
     for tile_idx, gs_indices in tile_indices.items():
         # print(f"Exporting tile {tile_idx} with {len(gs_indices[layer_idx])} Gaussians...")
