@@ -2,7 +2,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 import sys
-sys.path.append('/mnt/data1/syjintw/GS-Interface')
+# sys.path.append('/mnt/data1/syjintw/GS-Interface')s
+sys.path.append('/home/syjintw/Desktop/NUS/GS-Interface')
 import io_3dgs
 from io_3dgs import GaussianModelV2
 
@@ -48,18 +49,8 @@ if __name__ == "__main__":
 # Example usage:
 
 python lapisgs2gs.py \
---input_root ./dataset/ours/longdress_lapisgs/frame_0000 \
---output_root ./dataset/ours2gs/longdress_lapisgs/frame_0000 \
---target_layer 3
-
-python lapisgs2gs.py \
---input_root ./merged_output/longdress_lapisgs/frame_0000 \
---output_root ./lapisgs2gs_output/longdress_lapisgs/frame_0000 \
---target_layer 3
-
-python lapisgs2gs.py \
---input_root ./merged_output/longdress_lapisgs/frame_0001 \
---output_root ./lapisgs2gs_output/longdress_lapisgs/frame_0001 \
+--input_root ./dataset/ours/lego_lapisgs/frame_0000 \
+--output_root ./dataset/ours2gs/lego_lapisgs/frame_0000 \
 --target_layer 3
 """
 

@@ -6,7 +6,8 @@ from argparse import ArgumentParser
 import time
 
 import sys
-sys.path.append('/mnt/data1/syjintw/GS-Interface')
+# sys.path.append('/mnt/data1/syjintw/GS-Interface')
+sys.path.append('/home/syjintw/Desktop/NUS/GS-Interface')
 
 import io_3dgs
 from io_3dgs import GaussianModelV2
@@ -89,31 +90,29 @@ def main_gs(scene_name,
 
 def main_lapisgs(scene_name,
                 input_root, output_root, 
-                input_start_frame, output_start_frame, total_frame, 
+                output_start_frame, 
                 res_list, lod_list):
     input_root = Path(input_root)
     output_root = Path(output_root)
     
-    for frame_offset in range(total_frame):
-        input_frame = input_start_frame + frame_offset
-        output_frame = output_start_frame + frame_offset
-        print(f"Processing frame {input_frame} --> {output_frame}")
-        
-        gs_list = []
-        for res in res_list:
-            #! Change to your correct path
-            gs_path = input_root / f"{scene_name}_res{res}" / f"dynamic_{input_frame:04d}" / "point_cloud" / "iteration_30000" / "point_cloud.ply" 
-            gs = io_3dgs.GaussianModelV2(gs_path)
-            gs_list.append(gs)
+    output_frame = output_start_frame
+    print(f"Processing frame --> {output_frame}")
+    
+    gs_list = []
+    for res in res_list:
+        #! Change to your correct path
+        gs_path = input_root / f"{scene_name}_res{res}" / "point_cloud" / "iteration_30000" / "point_cloud.ply" 
+        gs = io_3dgs.GaussianModelV2(gs_path)
+        gs_list.append(gs)
 
-        separated_gs_list = lapisgs_separate_level(gs_list)
+    separated_gs_list = lapisgs_separate_level(gs_list)
+    
+    for i, gs in enumerate(separated_gs_list):
+        output_path = output_root / f"frame_{output_frame:04d}" / f"lod{lod_list[i]}"
+        output_gs_path = output_path / "point_cloud" / "iteration_30000" / "point_cloud.ply"
+        output_gs_path.parent.mkdir(parents=True, exist_ok=True)
+        gs.export_gs_to_ply(output_gs_path)
         
-        for i, gs in enumerate(separated_gs_list):
-            output_path = output_root / f"frame_{output_frame:04d}" / f"lod{lod_list[i]}"
-            output_gs_path = output_path / "point_cloud" / "iteration_30000" / "point_cloud.ply"
-            output_gs_path.parent.mkdir(parents=True, exist_ok=True)
-            gs.export_gs_to_ply(output_gs_path)
-            
 
 def main_dlapisgs(scene_name,
                 input_root, output_root, 
@@ -196,9 +195,10 @@ if __name__ == "__main__":
     parser.add_argument("--scene_name", default="longdress", type=str)
     parser.add_argument("--input_root", default="./dataset/dlapisgs/longdress/opacity", type=str)
     parser.add_argument("--output_root", default="./dataset/ours/longdress_dlapisgs", type=str)
-    parser.add_argument("--input_start_frame", default=0, type=int)
+    
+    parser.add_argument("--input_start_frame", default=0, type=int) # Only dlapisgs need input_start_frame
     parser.add_argument("--output_start_frame", default=0, type=int)
-    parser.add_argument("--total_frames", default=90, type=int)
+    parser.add_argument("--total_frames", default=1, type=int)
     
     parser.add_argument("--gs_type", default="gs", type=str)
     
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         if args.gs_type == "lapisgs":
             main_lapisgs(args.scene_name,
                         args.input_root, args.output_root, 
-                        args.input_start_frame, args.output_start_frame, args.total_frames, 
+                        args.output_start_frame, 
                         args.res_list, args.lod_list)
             
         elif args.gs_type == "dlapisgs":
@@ -255,8 +255,20 @@ if __name__ == "__main__":
 """
 # Example usage:
 
+# Static
+## LapisGS
+python dataset2ours.py \
+--scene_name lego \
+--input_root ./dataset/lapisgs/lego/opacity \
+--output_root ./dataset/ours/lego_lapisgs \
+--output_start_frame 0 \
+--gs_type lapisgs \
+--res_list 8 4 2 1 \
+--lod_list 0 1 2 3
+
+
 # GS (0.98 seconds for 12 frames)
-python dataset_cleaner.py \
+python dataset2ours.py \
 --scene_name longdress \
 --input_root ./dataset/dlapisgs/longdress/opacity \
 --output_root ./dataset/ours/longdress_gs \
@@ -264,7 +276,7 @@ python dataset_cleaner.py \
 --gs_type gs
 
 # LapisGS (24.85 seconds for 12 frames)
-python dataset_cleaner.py \
+python dataset2ours.py \
 --scene_name longdress \
 --input_root ./dataset/dlapisgs/longdress/opacity \
 --output_root ./dataset/ours/longdress_lapisgs \
@@ -274,7 +286,7 @@ python dataset_cleaner.py \
 --lod_list 0 1 2
 
 # DLapisGS (16.13 seconds for 12 frames, with frame_in_group=3)
-python dataset_cleaner.py \
+python dataset2ours.py \
 --scene_name longdress \
 --input_root ./dataset/dlapisgs/longdress/opacity \
 --output_root ./dataset/ours/longdress_dlapisgs \
@@ -283,16 +295,5 @@ python dataset_cleaner.py \
 --res_list 8 4 2 1 \
 --lod_list 0 1 2 3 \
 --frame_in_group 3
-"""
-
-"""
-python dataset_cleaner.py \
---scene_name longdress \
---input_root ./dataset/dlapisgs/longdress/opacity \
---output_root ./dataset/ours/longdress_lapisgs \
---input_start_frame 1051 --output_start_frame 0 --total_frames 3 \
---gs_type lapisgs \
---res_list 8 4 2 1 \
---lod_list 0 1 2 3
 """
 

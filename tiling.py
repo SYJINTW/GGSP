@@ -7,7 +7,8 @@ from collections import defaultdict
 import sys
 import time
 
-sys.path.append('/mnt/data1/syjintw/GS-Interface')
+# sys.path.append('/mnt/data1/syjintw/GS-Interface')
+sys.path.append('/home/syjintw/Desktop/NUS/GS-Interface')
 
 import io_3dgs
 from io_3dgs import GaussianModelV2
@@ -371,6 +372,7 @@ if __name__ == "__main__":
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"Total tiling time: {elapsed_time:.2f} seconds")
+
 """
 # Example usage:
 
@@ -383,11 +385,11 @@ python tiling.py \
 --tiling_method uniform \
 --grid_shape 2 2 2
 
-# LapisGS (23.73 seconds for 12 frames)
+# LapisGS (11.59 seconds for 3 frames)
 python tiling.py \
---input_root ./dataset/ours/longdress_lapisgs \
---output_root ./tiling_output/longdress_lapisgs_tiled/uniform \
---start_frame 0 --total_frames 12 \
+--input_root ./dataset/ours/lego_lapisgs \
+--output_root ./tiling_output/lego_lapisgs_tiled/uniform \
+--start_frame 0 --total_frames 3 \
 --gs_type lapisgs \
 --total_layers 4 \
 --tiling_method uniform \

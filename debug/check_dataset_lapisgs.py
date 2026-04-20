@@ -1,19 +1,19 @@
 from pathlib import Path
 
 import sys
-sys.path.append('/mnt/data1/syjintw/GS-Interface')
+sys.path.append('/home/syjintw/Desktop/NUS/GS-Interface')
 import io_3dgs
 from io_3dgs import GaussianModelV2
 
-frame = 1080
-res_list = [4, 2, 1] # from low to high
+res_list = [8, 4, 2, 1] # from low to high
+scene_name = "lego"
 
-input_root = Path("/mnt/data1/syjintw/NUS/code/dataset/dlapisgs/longdress/opacity")
+input_root = Path(f"../dataset/lapisgs/{scene_name}/opacity")
 
 gs_list = []
 num_of_gs_list = []
 for res in res_list:
-    gs_path = input_root / f"longdress_res{res}" / f"dynamic_{frame:04d}" / "point_cloud" / "iteration_30000" / "point_cloud.ply"
+    gs_path = input_root / f"{scene_name}_res{res}" / "point_cloud" / "iteration_30000" / "point_cloud.ply"
     gs = GaussianModelV2(gs_path)
     gs_list.append(gs)
     num_of_gs_list.append(gs.num_of_point)

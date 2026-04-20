@@ -5,19 +5,22 @@
 
 export CUDA_VISIBLE_DEVICES=0
 
-SCENE_NAME="longdress"
+SCENE_NAME="lego"
 TOTAL_FRAMES=3
+TILING_METHOD="uniform"
 GS_TYPE="lapisgs"
-TOTAL_LAYERS=3
+TOTAL_LAYERS=4
 
 for FRAME_IDX in $(seq 0 $((TOTAL_FRAMES - 1))); do
     PADDED_IDX=$(printf "%04d" ${FRAME_IDX})
     echo "Processing frame index: ${PADDED_IDX}"
     for LAYER_IDX in $(seq 0 $((TOTAL_LAYERS - 1))); do
         echo "Processing layer index: ${LAYER_IDX}"
-        python lapisgs2gs.py \
-            --input_root ./dataset/ours/${SCENE_NAME}_${GS_TYPE}/frame_${PADDED_IDX} \
-            --output_root ./dataset/ours2gs/${SCENE_NAME}_${GS_TYPE}/frame_${PADDED_IDX} \
-            --target_layer ${LAYER_IDX}
+        python merge_tiles.py \
+            --input_root ./tiling_output/${SCENE_NAME}_${GS_TYPE}_tiled/${TILING_METHOD}/frame_${PADDED_IDX}/lod${LAYER_IDX} \
+            --output_root ./merged_output/${SCENE_NAME}_${GS_TYPE}/frame_${PADDED_IDX}/lod${LAYER_IDX}/point_cloud/iteration_30000/point_cloud.ply \
+            --gs_type ${GS_TYPE} \
+            --tiling_method ${TILING_METHOD} \
+            --selected_tiles all
     done
 done
