@@ -29,7 +29,11 @@ from io_3dgs import GaussianModelV2
 # "layer_idx": layer_idx
 # }
 
-            
+def load_custom_selected_tiles_json(custom_selection_path):
+    with open(custom_selection_path, 'r') as f:
+        selected_tiles = json.load(f)
+    return selected_tiles
+
 def merge_tiles(tiles_path_list):
     gs_merged = None
     for tile_path in tiles_path_list:
@@ -67,10 +71,11 @@ if __name__ == "__main__":
     # parser.add_argument("--grid_shape", nargs=3, type=int, default=[4, 4, 4], help="Number of tiles along each axis (x, y, z)")
     
     parser.add_argument("--selected_tiles", type=str, default="all", 
-                        choices=["all", "custom"], help="Merging all tiles or only custom selected tiles, if custom, need to specify the tile indices in a json file")
-    
+                        choices=["all", "custom", "all_from_input"], help="Merging all tiles or only custom selected tiles, if custom, need to specify the tile indices in a json file")
+    parser.add_argument("--custom_selection_path", type=str, default="./tools/custom_tiling_selection/custom.json", help="Path to the JSON file containing custom selected tile keys (only used when --selected_tiles is 'custom')")
     args = parser.parse_args()
     
+    start_time = time.time()
     if args.tiling_method == "uniform":
         if args.gs_type == "gs" or args.gs_type == "lapisgs":
             # Only have one layer, so total_layers must be 1
@@ -80,9 +85,17 @@ if __name__ == "__main__":
             
             if args.selected_tiles == "all":
                 selected_tile_keys = [key for key in tiles_info["tile_keys"]]
+                tiles_path_list = [Path(args.input_root) / f"tile_{k[0]}_{k[1]}_{k[2]}.ply" for k in selected_tile_keys]
+            
             elif args.selected_tiles == "custom":
-                pass
-            tiles_path_list = [Path(args.input_root) / f"tile_{k[0]}_{k[1]}_{k[2]}.ply" for k in selected_tile_keys]
+                selected_tiles = load_custom_selected_tiles_json(args.custom_selection_path)
+                selected_tile_keys = selected_tiles["selected_tile_keys"]
+                tiles_path_list = [Path(args.input_root) / f"tile_{k[0]}_{k[1]}_{k[2]}.ply" for k in selected_tile_keys]
+            
+            elif args.selected_tiles == "all_from_input":
+                # Get all the .ply files in the input_root folder
+                tiles_path_list = list(Path(args.input_root).glob("*.ply"))
+                
             merged_gs = merge_tiles(tiles_path_list)
             
             # Export the merged Gaussian model to PLY format
@@ -90,38 +103,75 @@ if __name__ == "__main__":
             output_path.parent.mkdir(parents=True, exist_ok=True)
             merged_gs.export_gs_to_ply(output_path)
     
+    end_time = time.time()
+    print(f"Merging completed in {end_time - start_time:.2f} seconds.")
         
 """
 # Example usage:
 
-# GS
+## GS
 python merge_tiles.py \
---input_root ./tiling_output/longdress_gs_tiled/uniform/frame_0000/lod0 \
---output_root ./merged_output/longdress_gs/frame_0000/lod0/point_cloud/iteration_30000/point_cloud.ply \
+--input_root ./tiling_output/materials_gs_tiled/uniform/frame_0000/lod0 \
+--output_root ./merged_output/materials_gs/all/frame_0000/lod0/point_cloud/iteration_15000/point_cloud.ply \
 --gs_type gs \
 --tiling_method uniform \
 --selected_tiles all
 
-# LapisGS
-## LOD0
+## LapisGS
+### LOD0
 python merge_tiles.py \
---input_root ./tiling_output/longdress_lapisgs_tiled/uniform/frame_0000/lod0 \
---output_root ./merged_output/longdress_lapisgs/frame_0000/lod0/point_cloud/iteration_30000/point_cloud.ply \
+--input_root ./tiling_output/lego_lapisgs_tiled/uniform/frame_0000/lod0 \
+--output_root ./merged_output/lego_lapisgs/all/frame_0000/lod0/point_cloud/iteration_30000/point_cloud.ply \
 --gs_type lapisgs \
 --tiling_method uniform \
 --selected_tiles all
 
-## LOD1
+### LOD1
 python merge_tiles.py \
---input_root ./tiling_output/longdress_lapisgs_tiled/uniform/frame_0000/lod1 \
---output_root ./merged_output/longdress_lapisgs/frame_0000/lod1/point_cloud/iteration_30000/point_cloud.ply \
+--input_root ./tiling_output/lego_lapisgs_tiled/uniform/frame_0000/lod1 \
+--output_root ./merged_output/lego_lapisgs/all/frame_0000/lod1/point_cloud/iteration_30000/point_cloud.ply \
 --gs_type lapisgs \
 --tiling_method uniform \
 --selected_tiles all
 
-## LOD2
-...
+### LOD2
+python merge_tiles.py \
+--input_root ./tiling_output/lego_lapisgs_tiled/uniform/frame_0000/lod2 \
+--output_root ./merged_output/lego_lapisgs/all/frame_0000/lod2/point_cloud/iteration_30000/point_cloud.ply \
+--gs_type lapisgs \
+--tiling_method uniform \
+--selected_tiles all
 
-# D-LapisGS
+### LOD3
+python merge_tiles.py \
+--input_root ./tiling_output/lego_lapisgs_tiled/uniform/frame_0000/lod3 \
+--output_root ./merged_output/lego_lapisgs/all/frame_0000/lod3/point_cloud/iteration_30000/point_cloud.ply \
+--gs_type lapisgs \
+--tiling_method uniform \
+--selected_tiles all
 
+# D-LapisGS (Not Yet Implemented)
+"""
+
+"""
+## LapisGS
+### LOD0
+python merge_tiles.py \
+--input_root ./tiling_output/lego_lapisgs_tiled/uniform/frame_0000/lod0 \
+--output_root ./merged_output/lego_lapisgs/custom/frame_0000/lod0/point_cloud/iteration_30000/point_cloud.ply \
+--gs_type lapisgs \
+--tiling_method uniform \
+--selected_tiles custom \
+--custom_selection_path ./tools/custom_tiling_selection/custom.json
+"""
+
+"""
+## LapisGS
+### LOD0
+python merge_tiles.py \
+--input_root ./tiling_output/lego_lapisgs_tiled/uniform/frame_0000/lod0 \
+--output_root ./merged_output/lego_lapisgs/all_from_input/frame_0000/lod0/point_cloud/iteration_30000/point_cloud.ply \
+--gs_type lapisgs \
+--tiling_method uniform \
+--selected_tiles all_from_input
 """

@@ -246,6 +246,8 @@ if __name__ == "__main__":
     parser.add_argument("--input_root", default="./dataset/ours/longdress_gs", type=str)
     parser.add_argument("--output_root", default="./tiling_output/longdress_gs_tiled", type=str)
     
+    parser.add_argument("--iteration", default=30000, type=int)
+    
     parser.add_argument("--start_frame", default=0, type=int)
     parser.add_argument("--total_frames", default=12, type=int)
     
@@ -277,7 +279,7 @@ if __name__ == "__main__":
             # Each frame is cutting into tiles independently, without considering temporal consistency
             for i in range(args.start_frame, args.start_frame + args.total_frames):
                 print(f"Processing frame {i}...")
-                gs_path_list = [f"{args.input_root}/frame_{i:04d}/lod{layer_idx}/point_cloud/iteration_30000/point_cloud.ply" for layer_idx in range(args.total_layers)]
+                gs_path_list = [f"{args.input_root}/frame_{i:04d}/lod{layer_idx}/point_cloud/iteration_{args.iteration}/point_cloud.ply" for layer_idx in range(args.total_layers)]
                 gs_list = [GaussianModelV2(gs_path) for gs_path in gs_path_list]
                 tile_aabbs, tile_indices, scene_min, scene_max = tiling_uniform_layered_gs(gs_list, args.grid_shape)
                 
@@ -297,6 +299,7 @@ if __name__ == "__main__":
                     )
                     
                     export_tiles_to_ply(gs_list[layer_idx], tile_indices, layer_idx, output_dir)
+                    
         elif args.gs_type == "dlapisgs":
             # Handle "dlapisgs" type if needed
             # Only use the first frame for tiling, since the dynamic tiling will be applied in the later pipeline stage
@@ -376,26 +379,28 @@ if __name__ == "__main__":
 """
 # Example usage:
 
-# GS (18.75 seconds for 12 frames)
+## GS
 python tiling.py \
---input_root ./dataset/ours/longdress_gs \
---output_root ./tiling_output/longdress_gs_tiled/uniform \
---start_frame 0 --total_frames 12 \
+--input_root ./dataset/ours/materials_gs \
+--output_root ./tiling_output/materials_gs_tiled/uniform \
+--iteration 15000 \
+--start_frame 0 --total_frames 1 \
 --gs_type gs \
 --tiling_method uniform \
 --grid_shape 2 2 2
 
-# LapisGS (11.59 seconds for 3 frames)
+## LapisGS
 python tiling.py \
 --input_root ./dataset/ours/lego_lapisgs \
 --output_root ./tiling_output/lego_lapisgs_tiled/uniform \
---start_frame 0 --total_frames 3 \
+--iteration 30000 \
+--start_frame 0 --total_frames 1 \
 --gs_type lapisgs \
 --total_layers 4 \
 --tiling_method uniform \
 --grid_shape 2 2 2
 
-# DLapisGS (9.15 seconds for 12 frames)
+# DLapisGS (Not Yet Implemented)
 python tiling.py \
 --input_root ./dataset/ours/longdress_dlapisgs \
 --output_root ./tiling_output/longdress_dlapisgs_tiled/uniform \
@@ -405,5 +410,4 @@ python tiling.py \
 --total_layers 4 \
 --tiling_method uniform \
 --grid_shape 2 2 2
-
 """
