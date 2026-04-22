@@ -7,7 +7,7 @@
    viewBox="0 0 4493.8584 3178.5828"
    version="1.1"
    id="svg1"
-   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    sodipodi:docname="GGSP.svg"
    inkscape:export-filename="GGSP.png"
    inkscape:export-xdpi="96"
@@ -26,15 +26,16 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.35355339"
-     inkscape:cx="756.60426"
-     inkscape:cy="1305.3191"
-     inkscape:window-width="2560"
-     inkscape:window-height="1361"
-     inkscape:window-x="3191"
-     inkscape:window-y="-9"
+     inkscape:zoom="0.42735677"
+     inkscape:cx="1639.1457"
+     inkscape:cy="1403.9792"
+     inkscape:window-width="1920"
+     inkscape:window-height="1021"
+     inkscape:window-x="1920"
+     inkscape:window-y="31"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     inkscape:export-bgcolor="#ffffffff" />
   <defs
      id="defs1">
     <rect
@@ -213,6 +214,25 @@
          style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135-1-4" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle-6-6-2-4"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="0.5"
+       markerHeight="0.5"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-8-6-5-6" />
     </marker>
   </defs>
   <g
@@ -489,6 +509,11 @@
        id="path12-5-5-3"
        sodipodi:nodetypes="cc" />
     <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:11.3386;stroke-miterlimit:7;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Triangle-6-6-2-4)"
+       d="m 1843.6169,1867.9 0,-49.5563"
+       id="path12-5-5-3-2"
+       sodipodi:nodetypes="cc" />
+    <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:11.3386;stroke-miterlimit:7;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Triangle-6-6-2-1)"
        d="m 1615.6299,1685.7847 h -232.256"
        id="path12-5-5-3-7"
@@ -514,6 +539,22 @@
          y="1653.0811"
          style="font-size:32px;line-height:0.6"
          id="tspan14-9-6-9">(Our Format)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:53.3333px;line-height:0.6;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-miterlimit:7;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       x="1843.8383"
+       y="1918.418"
+       id="text12-0-4-1-8"><tspan
+         sodipodi:role="line"
+         x="1843.8383"
+         y="1918.418"
+         style="font-size:53.3333px;line-height:0.6"
+         id="tspan14-9-6-9-38">Selected Tiles Info.</tspan><tspan
+         sodipodi:role="line"
+         x="1843.8383"
+         y="1950.418"
+         style="font-size:32px;line-height:0.6"
+         id="tspan10">(all / custom / all_from_input)</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:53.3333px;line-height:0.6;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-miterlimit:7;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -562,7 +603,12 @@
          x="1233.8975"
          y="1407.9991"
          style="font-size:32px;line-height:0.6"
-         id="tspan14-9-6-9-3-3-0">./debug/check_merge_tiles_lapisgs.py</tspan></text>
+         id="tspan14-9-6-9-3-3-0">./debug/check_merge_tiles_gs.py</tspan><tspan
+         sodipodi:role="line"
+         x="1233.8975"
+         y="1439.9991"
+         style="font-size:32px;line-height:0.6"
+         id="tspan9">./debug/check_merge_tiles_lapisgs.py</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:53.3333px;line-height:0.6;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:11.3386;stroke-miterlimit:7;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
