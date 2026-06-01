@@ -8,14 +8,16 @@ from io_3dgs import GaussianModelV2
 res_list = [8, 4, 2, 1] # from low to high
 scene_name = "longdress"
 
-# input_root = Path(f"../dataset/dlapisgs/{scene_name}/opacity")
-input_root = Path(f"/home/syjintw/Desktop/NUS/dynamic-lapis-gs/model/8i/longdress/my-dynamic-lapis")
+input_root = Path(f"../dataset/dlapisgs/{scene_name}/opacity")
+# input_root = Path(f"/home/syjintw/Desktop/NUS/dynamic-lapis-gs/model/8i/longdress/my-dynamic-lapis")
+# input_root = Path(f"/home/syjintw/Desktop/NUS/dynamic-lapis-gs/model/8i/longdress/dynamic-lapis")
 
 start_frame = 1051
 group_of_frames = 2
 total_groups = 1
 
-iterations = 3000
+# iterations = 3000
+iterations = 30000
 
 for group_idx in range(total_groups):
     print(f"Group {group_idx}: frames {start_frame + group_idx*group_of_frames} to {start_frame + (group_idx+1)*group_of_frames - 1}")
