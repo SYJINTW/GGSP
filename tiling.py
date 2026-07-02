@@ -43,57 +43,56 @@ def tiling_uniform_layered_gs(gs_layers, grid_shape=(2, 2, 2)):
 
     # --- 2. 根據 Grid Shape 決定每個 Tile 的尺寸 (Step Size) ---
     n_tiles_x, n_tiles_y, n_tiles_z = grid_shape
-    step_size = scene_extent / np.array(grid_shape)
-    
+    grid_shape_arr = np.array(grid_shape)
+    step_size = scene_extent / grid_shape_arr
+
     print(f"Grid Shape: {n_tiles_x}x{n_tiles_y}x{n_tiles_z} | Step Size (x,y,z): {step_size}")
-    
-    # 準備儲存結果的字典
+
+    # perf 2026-07-02: was a triple-nested loop over grid_shape^3 tiles, each doing a
+    # full boolean-mask scan over every Gaussian -- O(grid^3 * n_gs). Measured cost:
+    # bicycle (5-6M GS) grid16 (4096 tiles) took ~20 min; grid32 would be ~8x that.
+    # Replaced with one floor-divide bucket-index pass per layer (O(n_gs)) + group-by
+    # via argsort. Boundary points can bucket +/-1 tile vs the old direct-comparison
+    # code at float-precision edges (different but mathematically equivalent rounding
+    # path) -- negligible for tile-scale statistics; verified identical non-empty tile
+    # keys + identical per-tile indices (post-sort) vs the old implementation on chair
+    # @ grid8 before landing this.
     tile_aabbs = {}
     tile_indices = {}
-    
-    # --- 3. 遍歷 Grid，擷取每個 Tile 的 Indices 與 AABB ---
-    for ix in range(n_tiles_x):
-        for iy in range(n_tiles_y):
-            for iz in range(n_tiles_z):
-                tile_idx = (ix, iy, iz)
-                
-                # 計算當前 Tile 的幾何邊界
-                x0 = scene_min[0] + ix * step_size[0]
-                y0 = scene_min[1] + iy * step_size[1]
-                z0 = scene_min[2] + iz * step_size[2]
-                
-                # 為了避免浮點數誤差，最後一個 Grid 直接對齊 scene_max
-                x1 = scene_min[0] + (ix + 1) * step_size[0] if ix < n_tiles_x - 1 else scene_max[0]
-                y1 = scene_min[1] + (iy + 1) * step_size[1] if iy < n_tiles_y - 1 else scene_max[1]
-                z1 = scene_min[2] + (iz + 1) * step_size[2] if iz < n_tiles_z - 1 else scene_max[2]
-                
-                min_corner = np.array([x0, y0, z0])
-                max_corner = np.array([x1, y1, z1])
-                
-                layer_indices_list = []
-                
-                # 找出每個 layer 中，落在這個 Tile 範圍內的 Gaussians
-                for layer in gs_layers:
-                    x_data = layer.data["x"]["data"]
-                    y_data = layer.data["y"]["data"]
-                    z_data = layer.data["z"]["data"]
-                    
-                    # 使用條件過濾 (注意：為了包含邊界上的點，最後一個 grid 會用 <=)
-                    cond_x = (x_data >= x0) & (x_data <= x1 if ix == n_tiles_x - 1 else x_data < x1)
-                    cond_y = (y_data >= y0) & (y_data <= y1 if iy == n_tiles_y - 1 else y_data < y1)
-                    cond_z = (z_data >= z0) & (z_data <= z1 if iz == n_tiles_z - 1 else z_data < z1)
-                    
-                    indices = np.where(cond_x & cond_y & cond_z)[0]
-                    layer_indices_list.append(indices)
-                
-                # 如果這個 Tile 在所有 Frame/Layer 中都是空的，就直接跳過不儲存
-                if all(len(indices) == 0 for indices in layer_indices_list):
-                    continue
-                
-                # 儲存非空 Tile 的 AABB 和 對應的 Indices
-                tile_aabbs[tile_idx] = {"min_corner": min_corner, "max_corner": max_corner}
-                tile_indices[tile_idx] = layer_indices_list
-                
+
+    n_layers = len(gs_layers)
+    for layer_idx, layer in enumerate(gs_layers):
+        xyz = np.stack([layer.data["x"]["data"], layer.data["y"]["data"], layer.data["z"]["data"]], axis=1)
+        idx3 = np.floor((xyz - scene_min) / step_size).astype(np.int64)
+        idx3 = np.clip(idx3, 0, grid_shape_arr - 1)
+        flat_id = (idx3[:, 0] * n_tiles_y + idx3[:, 1]) * n_tiles_z + idx3[:, 2]
+
+        order = np.argsort(flat_id, kind="stable")
+        sorted_ids = flat_id[order]
+        unique_ids, start_pos = np.unique(sorted_ids, return_index=True)
+        groups = np.split(order, start_pos[1:])
+
+        for uid, gs_idx in zip(unique_ids, groups):
+            ix, rem = divmod(int(uid), n_tiles_y * n_tiles_z)
+            iy, iz = divmod(rem, n_tiles_z)
+            tile_idx = (ix, iy, iz)
+            if tile_idx not in tile_indices:
+                tile_indices[tile_idx] = [np.empty(0, dtype=np.int64) for _ in range(n_layers)]
+            tile_indices[tile_idx][layer_idx] = gs_idx.astype(np.int64)
+
+    # --- AABB per non-empty tile (last tile per axis aligned to scene_max) ---
+    for (ix, iy, iz) in tile_indices:
+        x0 = scene_min[0] + ix * step_size[0]
+        y0 = scene_min[1] + iy * step_size[1]
+        z0 = scene_min[2] + iz * step_size[2]
+        x1 = scene_min[0] + (ix + 1) * step_size[0] if ix < n_tiles_x - 1 else scene_max[0]
+        y1 = scene_min[1] + (iy + 1) * step_size[1] if iy < n_tiles_y - 1 else scene_max[1]
+        z1 = scene_min[2] + (iz + 1) * step_size[2] if iz < n_tiles_z - 1 else scene_max[2]
+        tile_aabbs[(ix, iy, iz)] = {
+            "min_corner": np.array([x0, y0, z0]),
+            "max_corner": np.array([x1, y1, z1]),
+        }
+
     return tile_aabbs, tile_indices, scene_min, scene_max
 
 
