@@ -379,12 +379,22 @@ if __name__ == "__main__":
 """
 # Example usage:
 
-## GS
+## GS (Single frame)
 python tiling.py \
 --input_root ./dataset/ours/materials_gs \
 --output_root ./tiling_output/materials_gs_tiled/uniform \
 --iteration 15000 \
 --start_frame 0 --total_frames 1 \
+--gs_type gs \
+--tiling_method uniform \
+--grid_shape 2 2 2
+
+## GS (Multiple frames)
+python tiling.py \
+--input_root ./dataset/ours/longdress_gs \
+--output_root ./tiling_output/longdress_gs_tiled/uniform \
+--iteration 30000 \
+--start_frame 0 --total_frames 6 \
 --gs_type gs \
 --tiling_method uniform \
 --grid_shape 2 2 2

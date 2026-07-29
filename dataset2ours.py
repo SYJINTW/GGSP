@@ -203,7 +203,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_start_frame", default=0, type=int)
     parser.add_argument("--total_frames", default=1, type=int)
     
-    parser.add_argument("--gs_type", default="gs", type=str)
+    parser.add_argument("--gs_type", default="gs", type=str, choices=["gs", "gs_multiframes", "lapisgs", "dlapisgs"])
     
     # If gs_type is "gs", then we expect the input is the original Gaussians
     # If gs_type is "lapisgs"
@@ -222,6 +222,17 @@ if __name__ == "__main__":
                 args.iteration,
                 args.output_start_frame)
     
+    elif args.gs_type == "gs_multiframes":
+        for frame_offset in range(args.total_frames):
+            input_frame = args.input_start_frame + frame_offset
+            output_frame = args.output_start_frame + frame_offset
+            print(f"Processing frame --> {input_frame} --> {output_frame}")
+            input_root = Path(args.input_root) / f"{input_frame:04d}" # [NOTE] Make sure the format is using {:04d}
+            main_gs(args.scene_name,
+                    input_root, args.output_root, 
+                    args.iteration,
+                    output_frame)
+            
     elif args.gs_type == "lapisgs" or args.gs_type == "dlapisgs":
         # Check if the number of res_list and lod_list are the same
         if len(args.lod_list) == 0: # Let lod start from 0 (lowest level) and increase by 1
@@ -272,7 +283,7 @@ python dataset2ours.py \
 --iteration 15000 \
 --output_start_frame 0 \
 --gs_type gs
-    
+
 ## LapisGS
 python dataset2ours.py \
 --scene_name lego \
@@ -283,6 +294,16 @@ python dataset2ours.py \
 --gs_type lapisgs \
 --res_list 8 4 2 1 \
 --lod_list 0 1 2 3
+
+# Dynamic
+## GS Multiframes
+python dataset2ours.py \
+--scene_name longdress \
+--input_root ./dataset/gs/longdress \
+--output_root ./dataset/ours/longdress_gs \
+--iteration 30000 \
+--input_start_frame 1051 --output_start_frame 0 --total_frames 6 \
+--gs_type gs_multiframes
 
 ## DLapisGS (Not Yet Implemented)
 python dataset2ours.py \

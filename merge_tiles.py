@@ -109,10 +109,27 @@ if __name__ == "__main__":
 """
 # Example usage:
 
-## GS
+## GS (Single frame)
 python merge_tiles.py \
 --input_root ./tiling_output/materials_gs_tiled/uniform/frame_0000/lod0 \
 --output_root ./merged_output/materials_gs/all/frame_0000/lod0/point_cloud/iteration_15000/point_cloud.ply \
+--gs_type gs \
+--tiling_method uniform \
+--selected_tiles all
+
+## GS (Multiple frames --> Need to do it frame by frame)
+### Frame 0
+python merge_tiles.py \
+--input_root ./tiling_output/longdress_gs_tiled/uniform/frame_0000/lod0 \
+--output_root ./merged_output/longdress_gs/all/frame_0000/lod0/point_cloud/iteration_30000/point_cloud.ply \
+--gs_type gs \
+--tiling_method uniform \
+--selected_tiles all
+
+### Frame 1
+python merge_tiles.py \
+--input_root ./tiling_output/longdress_gs_tiled/uniform/frame_0001/lod0 \
+--output_root ./merged_output/longdress_gs/all/frame_0001/lod0/point_cloud/iteration_30000/point_cloud.ply \
 --gs_type gs \
 --tiling_method uniform \
 --selected_tiles all
